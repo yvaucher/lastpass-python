@@ -118,20 +118,20 @@ def decode_blob(blob):
 
 def make_key(username, password, key_iteration_count):
     if key_iteration_count == 1:
-        return hashlib.sha256(username.encode() + password.encode()).digest()
+        return hashlib.sha256(username + password).digest()
     else:
         prf = lambda p, s: HMAC.new(p, s, SHA256).digest()
-        return PBKDF2(password.encode(), username.encode(), 32, key_iteration_count, prf)
+        return PBKDF2(password, username, 32, key_iteration_count, prf)
 
 
 def make_hash(username, password, key_iteration_count):
     if key_iteration_count == 1:
-        return bytearray(hashlib.sha256(hexlify(make_key(username, password, 1)) + password.encode()).hexdigest(), 'ascii')
+        return bytearray(hashlib.sha256(hexlify(make_key(username, password, 1)) + password).hexdigest(), 'ascii')
     else:
         prf = lambda p, s: HMAC.new(p, s, SHA256).digest()
         return hexlify(PBKDF2(
             make_key(username, password, key_iteration_count),
-            password.encode(),
+            password,
             32,
             1,
             prf))
